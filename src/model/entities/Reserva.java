@@ -4,15 +4,19 @@ import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.util.concurrent.TimeUnit;
 
+import model.exceptions.DominioExcecao;
+
 public class Reserva {
 	private Integer numeroQuarto;
 	private Date checkIn;
 	private Date checkOut;
-	
+
 	private static SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
-
 	public Reserva(Integer numeroQuarto, Date checkIn, Date checkOut) {
+		if (!checkOut.after(checkIn)) {
+			throw new DominioExcecao("Erro na reserva: Check-Out com data anterior ao Check-In");
+		}		
 		this.numeroQuarto = numeroQuarto;
 		this.checkIn = checkIn;
 		this.checkOut = checkOut;
@@ -39,31 +43,22 @@ public class Reserva {
 		return TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
 	}
 
-	public String atualizarDias(Date checkIn, Date checkOut) {
+	public void atualizarDias(Date checkIn, Date checkOut){
 		Date agora = new Date();
 		if (checkIn.before(agora) || checkOut.before(agora)) {
-			return "Erro na reserva: As datas de reserva para atualização devem ser futuras";
+			throw new DominioExcecao("\"Erro na reserva: As datas de reserva para atualização devem ser futuras");
 		}
-		if (!checkOut.after(checkIn)){
-			return "Erro na reserva: Check-Out com data anterior ao Check-In";
-		}	
-		
-		
+		if (!checkOut.after(checkIn)) {
+			throw new DominioExcecao("Erro na reserva: Check-Out com data anterior ao Check-In");
+		}
+
 		this.checkIn = checkIn;
 		this.checkOut = checkOut;
-		return null;
 	}
-	
+
 	@Override
 	public String toString() {
-		return "Quarto "
-				+ numeroQuarto
-				+ ", check-in: "
-				+ sdf.format(checkIn)
-				+ ", check-out: "
-				+ sdf.format(checkOut)
-				+ ", "
-				+ duracao()
-				+ " noites";
+		return "Quarto " + numeroQuarto + ", check-in: " + sdf.format(checkIn) + ", check-out: " + sdf.format(checkOut)
+				+ ", " + duracao() + " noites";
 	}
 }
